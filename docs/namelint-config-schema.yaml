@@ -28,8 +28,18 @@ properties:
           description: Rules to specifically disable
           items:
             type: string
+        ignore-files:
+          type: array
+          description: File names to explicitly allow
+          items:
+            type: string
         lint_id:
           type: string
+        part:
+          enum:
+            - base
+            - extension
+            - full
         paths:
           type: array
           description: Path patterns to apply these rules to
