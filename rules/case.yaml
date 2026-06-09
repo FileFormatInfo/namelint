@@ -1,19 +1,19 @@
 rules:
   - description: |
-      Base file name (i.e. without extension) must be uppercase ASCII alphanumeric.
+      All letters must be uppercase
     regex:
       pattern: "^[A-Z0-9.]+([.][a-zA-Z0-9]+)?$"
       case_insensitive: false
       expect: "match"
-    rule_id: "uppercase-ascii"
+    rule_id: "uppercase"
     title: "Uppercase file names (ASCII)"
 
   - description: |
-      Base file name (i.e. without extension) must be lowercase ASCII alphanumeric.
+      All letters must be lowercase
     regex:
       pattern: "^[a-z0-9.]+([.][a-zA-Z0-9]+)?$"
       case_insensitive: false
       expect: "match"
-    rule_id: "lowercase-ascii"
-    title: "Lowercase file names (ASCII)"
+    rule_id: "lowercase"
+    title: "Lowercase"
 
