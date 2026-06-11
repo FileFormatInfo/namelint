@@ -16,7 +16,15 @@ unicode-normalization = "0.1.24"
 
 [[bin]]
 name = "namelint"
-path = "src/main.rs"
+path = "src/bin/namelint.rs"
+
+[[bin]]
+name = "nameclean"
+path = "src/bin/nameclean.rs"
+
+[[bin]]
+name = "namefix"
+path = "src/bin/namefix.rs"
 
 [[bin]]
 name = "validate-cli"
