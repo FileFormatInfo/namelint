@@ -17,14 +17,9 @@ Which things to test
 
 ## Rules
 
-- [ ] no null bytes
-- [ ] utf8
-- [ ] no untrimmed (=no leading/trailing whitespace)
 - [ ] no windows reserved names
 - [ ] shell-safe: no chars that need shell escapes
-- [ ] internal whitespace: none | only single spaces | only spaces
 - [ ] no dotfiles
-- [ ] only posix safe chars
 - [ ] url safe
 - [ ] url component safe
 - [ ] punctuation: singledot,dashunderscore,most
