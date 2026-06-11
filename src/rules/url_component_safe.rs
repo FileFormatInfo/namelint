@@ -21,7 +21,7 @@ pub fn url_component_safe_builder(param: Option<String>) -> Option<RuleCheckFn> 
 pub fn rule() -> RuleSpec {
 	RuleSpec {
 		slug: "url_component_safe",
-		no_arg: "on",
+		no_arg: "off",
 		missing_value: "on",
 		values: &["on", "off"],
 		short_description: "Only characters safe as a URL path/query component (A-Za-z0-9-_).",

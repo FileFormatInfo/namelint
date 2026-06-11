@@ -65,8 +65,8 @@ pub fn whitespace_builder(param: Option<String>) -> Option<RuleCheckFn> {
 pub fn rule() -> RuleSpec {
 	RuleSpec {
 		slug: "whitespace",
-		no_arg: "none",
-		missing_value: "none",
+		no_arg: "space",
+		missing_value: "space",
 		values: &["none", "space", "spaces", "any"],
 		short_description: "Control how internal whitespace is allowed in filenames.",
 		long_description_markdown: "Controls internal whitespace policy for filenames.\n\n- `none`: no internal whitespace allowed\n- `space`: allow single ASCII spaces only\n- `spaces`: allow one or more ASCII spaces\n- `any`: allow any internal whitespace",

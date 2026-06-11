@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-pub use crate::path::{file_stem, file_extension};
 
 pub mod ascii_alphanumeric;
 pub mod nfc;

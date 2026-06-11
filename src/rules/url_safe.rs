@@ -20,7 +20,7 @@ pub fn url_safe_builder(param: Option<String>) -> Option<RuleCheckFn> {
 pub fn rule() -> RuleSpec {
 	RuleSpec {
 		slug: "url_safe",
-		no_arg: "on",
+		no_arg: "off",
 		missing_value: "on",
 		values: &["on", "off"],
 		short_description: "Only RFC 3986 unreserved characters (A-Za-z0-9-._~).",
