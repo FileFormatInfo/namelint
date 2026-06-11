@@ -1,11 +1,24 @@
 use clap::{Arg, Command};
 use namelint::collect_cli_dirs::collect_cli_dirs;
+use namelint::process_dirs::process_dirs;
 use namelint::rules::{builtin_rules, RuleCheckFn};
+use serde_json::json;
 
 /// An active checker: a rule slug paired with its compiled check function.
 struct ActiveRule {
     slug: &'static str,
     check: RuleCheckFn,
+}
+
+fn emit_failure(filename: &str, rule_slug: &str, output_format: &str) {
+    if output_format == "json" {
+        println!("{}", json!({
+            "filename": filename,
+            "rule": rule_slug,
+        }));
+    } else {
+        eprintln!("{}: {}", filename, rule_slug);
+    }
 }
 
 fn main() {
@@ -26,6 +39,15 @@ fn main() {
             Arg::new("paths")
                 .action(clap::ArgAction::Append)
                 .help("Directories to check (default: current directory)")
+                .required(false),
+        )
+        .arg(
+            Arg::new("output")
+                .long("output")
+                .value_name("FORMAT")
+                .value_parser(["plain", "json"])
+                .default_value("plain")
+                .help("Output format for failures: plain or json")
                 .required(false),
         );
 
@@ -54,6 +76,11 @@ fn main() {
         std::process::exit(1);
     });
 
+	let output_format = matches
+		.get_one::<String>("output")
+		.map(|value| value.as_str())
+		.unwrap_or("plain");
+
     if matches.get_flag("verbose") {
         for dir in &dirs {
             println!("DEBUG: directory on command line: {}", dir.display());
@@ -65,39 +92,40 @@ fn main() {
         }
     }
 
-    // Build active rules: rules whose builder returns Some(checker)
     let active: Vec<ActiveRule> = rules
         .iter()
         .filter_map(|rule| {
-            let param = matches.get_one::<String>(rule.slug).cloned()
+            let param = matches
+                .get_one::<String>(rule.slug)
+                .cloned()
                 .or_else(|| Some(rule.no_arg.to_string()));
             let check = (rule.check)(param)?;
             Some(ActiveRule { slug: rule.slug, check })
         })
         .collect();
 
-	let mut any_failure = false;
+    let error_count = process_dirs(dirs, |name| {
+        let mut file_error_count = 0usize;
 
-    for dir in &dirs {
-        let entries = std::fs::read_dir(dir).unwrap_or_else(|e| {
-            eprintln!("ERROR: cannot read directory {}: {}", dir.display(), e);
-            std::process::exit(1);
-        });
-
-        for entry in entries.flatten() {
-            let file_name = entry.file_name();
-            let name = file_name.to_string_lossy();
-
-            for active_rule in &active {
-                if !(active_rule.check)(&name) {
-                    eprintln!("{}: {}", name, active_rule.slug);
-                    any_failure = true;
-                }
+        for active_rule in &active {
+            if !(active_rule.check)(name) {
+                emit_failure(name, active_rule.slug, output_format);
+                file_error_count += 1;
             }
         }
-    }
 
-    if any_failure {
+        file_error_count
+    })
+    .unwrap_or_else(|e| {
+        eprintln!("ERROR: {}", e);
+        std::process::exit(1);
+    });
+
+	if matches.get_flag("verbose") {
+		println!("INFO: Total errors found: {}", error_count);
+	}
+
+    if error_count > 0 {
         std::process::exit(1);
     }
 }

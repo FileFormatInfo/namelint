@@ -6,6 +6,7 @@ pub mod load;
 pub mod parse_config;
 pub mod parse_rules;
 pub mod run_lint;
+pub mod process_dirs;
 pub mod rules;
 pub mod regex_rule;
 pub mod path;
