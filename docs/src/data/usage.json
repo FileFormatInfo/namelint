@@ -65,16 +65,6 @@
       "long": "ext-ci",
       "name": "ext-ci",
       "repeatable": true
-    },
-    {
-      "help": "Print generated command documentation in Markdown",
-      "long": "docs",
-      "name": "docs"
-    },
-    {
-      "help": "Print version",
-      "long": "version",
-      "name": "version"
     }
   ],
   "rules": [
@@ -163,8 +153,21 @@
       "long": "Restricts filenames to ASCII letters and digits.\n\n- `base`: no dots — alphanumerics only in the full name\n- `both`: allows a single dot separating an alphanumeric stem from an alphanumeric extension\n- `ext`: allows multiple dot-separated alphanumeric segments",
       "missing_value": "both",
       "no_arg": "ext",
-      "short": "Only ASCII alphanumeric characters, with optional dot separator.",
-      "slug": "ascii_alphanumeric",
+      "short": "Only ASCII alphanumeric characters",
+      "slug": "ascii_an",
+      "values": [
+        "off",
+        "base",
+        "ext",
+        "both"
+      ]
+    },
+    {
+      "long": "Restricts filenames to ASCII letters, digits, and dashes.\n\n- `base`: no dots — alphanumerics only in the full name\n- `both`: allows a single dot separating an alphanumeric stem from an alphanumeric extension\n- `ext`: allows multiple dot-separated alphanumeric segments",
+      "missing_value": "both",
+      "no_arg": "ext",
+      "short": "Only ASCII alphanumeric and dash characters",
+      "slug": "ascii_and",
       "values": [
         "off",
         "base",

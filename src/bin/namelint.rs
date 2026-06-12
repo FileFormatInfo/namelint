@@ -47,6 +47,7 @@ fn main() {
                 .value_parser(["plain", "json"])
                 .default_value("plain")
                 .help("Output format for failures: plain or json")
+                .require_equals(true)
                 .required(false),
 		)
         .arg(
@@ -56,6 +57,7 @@ fn main() {
                 .value_parser(["dir", "file", "both"])
                 .default_value("both")
                 .help("Entry type to validate: dir, file, or both")
+                .require_equals(true)
                 .required(false),
         )
         .arg(
@@ -64,6 +66,7 @@ fn main() {
                 .value_name("NAME")
                 .action(clap::ArgAction::Append)
                 .help("Directory name to skip (repeatable)")
+                .require_equals(true)
                 .required(false),
         )
         .arg(
@@ -72,6 +75,7 @@ fn main() {
                 .value_name("NAME")
                 .action(clap::ArgAction::Append)
                 .help("File name to skip (repeatable)")
+                .require_equals(true)
                 .required(false),
         )
         .arg(
@@ -80,6 +84,7 @@ fn main() {
                 .value_name("EXT")
                 .action(clap::ArgAction::Append)
                 .help("File extension filter, case-insensitive (repeatable)")
+                .require_equals(true)
                 .required(false),
         )
         .arg(
@@ -88,6 +93,7 @@ fn main() {
                 .value_name("EXT")
                 .action(clap::ArgAction::Append)
                 .help("File extension filter, case-sensitive (repeatable)")
+                .require_equals(true)
                 .required(false),
         )
         .arg(
@@ -96,6 +102,7 @@ fn main() {
                 .value_name("EXT")
                 .action(clap::ArgAction::Append)
                 .help("File extension filter, Unicode case-insensitive (repeatable)")
+                .require_equals(true)
                 .required(false),
         )
         .arg(
@@ -113,6 +120,7 @@ fn main() {
 				.long("version")
 				.action(clap::ArgAction::SetTrue)
 				.help("Print version")
+				.hide(true)
 			)
 		;
 
@@ -150,6 +158,7 @@ fn main() {
         let args_json: Vec<serde_json::Value> = command
             .get_arguments()
             .filter(|arg| !rule_slugs.contains(arg.get_id().as_str()))
+            .filter(|arg| !arg.is_hide_set())
             .filter_map(|arg| {
                 let mut arg_obj = serde_json::Map::new();
 

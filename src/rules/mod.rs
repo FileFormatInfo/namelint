@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
 
-pub mod ascii_alphanumeric;
+pub mod ascii_an;
+pub mod ascii_and;
 pub mod nfc;
 pub mod no_combining;
 pub mod trimmed;
@@ -32,7 +33,7 @@ impl RuleSpec {
 }
 
 pub fn builtin_rules() -> Vec<RuleSpec> {
-	vec![nfc::rule(), no_combining::rule(), trimmed::rule(), whitespace::rule(), posix_portable::rule(), url_safe::rule(), url_component_safe::rule(), ascii_alphanumeric::rule()]
+	vec![nfc::rule(), no_combining::rule(), trimmed::rule(), whitespace::rule(), posix_portable::rule(), url_safe::rule(), url_component_safe::rule(), ascii_an::rule(), ascii_and::rule()]
 }
 
 pub fn builtin_rules_by_slug() -> HashMap<&'static str, RuleSpec> {
