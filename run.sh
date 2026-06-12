@@ -25,7 +25,10 @@ fi
 export BUILTBY="run.sh"
 
 # install https://github.com/canop/bacon
-cargo install --locked bacon
+if ! command -v bacon &> /dev/null; then
+	echo "INFO: 'bacon' not found, installing..."
+	cargo install --locked bacon
+fi
 
 # run the app
 bacon run -- --bin namelint -- --version --verbose
