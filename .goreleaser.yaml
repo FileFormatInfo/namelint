@@ -1,0 +1,97 @@
+project_name: namelint
+version: 2
+
+before:
+  hooks:
+    - cargo clean
+
+builds:
+  - builder: rust
+    binary: namelint
+    targets:
+      - x86_64-unknown-linux-gnu
+      - aarch64-unknown-linux-gnu
+      - x86_64-apple-darwin
+      - aarch64-apple-darwin
+      - x86_64-pc-windows-gnu
+    flags:
+      - --release
+      - --bin=namelint
+
+  - builder: rust
+    binary: nameclean
+    targets:
+      - x86_64-unknown-linux-gnu
+      - aarch64-unknown-linux-gnu
+      - x86_64-apple-darwin
+      - aarch64-apple-darwin
+      - x86_64-pc-windows-gnu
+    flags:
+      - --release
+      - --bin=nameclean
+
+  - builder: rust
+    binary: namefix
+    targets:
+      - x86_64-unknown-linux-gnu
+      - aarch64-unknown-linux-gnu
+      - x86_64-apple-darwin
+      - aarch64-apple-darwin
+      - x86_64-pc-windows-gnu
+    flags:
+      - --release
+      - --bin=namefix
+
+archives:
+  - format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    name_template: >-
+      {{- .ProjectName }}-
+      {{- .Version }}-
+      {{- .Os }}-
+      {{- .Arch }}
+    files:
+      - README.md
+      - LICENSE.txt
+      - rules/
+
+checksum:
+  name_template: "{{ .ProjectName }}-{{ .Version }}-checksums.txt"
+  algorithm: sha256
+
+release:
+  github:
+    owner: FileFormatInfo
+    repo: namelint
+  draft: false
+  prerelease: auto
+  name_template: "Release {{.Version}}"
+  discussion_category_name: Releases
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore"
+      - "^ci:"
+      - "^refactor:"
+      - Merge pull request
+      - Merge branch
+
+nfpms:
+  - id: packages
+    package_name: namelint
+    homepage: "https://github.com/amarcuse/namelint"
+    description: "A linter and cleaner for file names"
+    maintainer: "amarcuse"
+    license: "MIT"
+    formats:
+      - deb
+      - rpm
+    bindir: /usr/bin
+    files:
+      rules/**/*: /etc/namelint/rules/
