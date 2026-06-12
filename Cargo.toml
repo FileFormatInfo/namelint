@@ -26,10 +26,3 @@ path = "src/bin/nameclean.rs"
 name = "namefix"
 path = "src/bin/namefix.rs"
 
-[[bin]]
-name = "validate-cli"
-path = "src/validate-cli.rs"
-
-[[bin]]
-name = "exam-cli"
-path = "src/exam-cli.rs"

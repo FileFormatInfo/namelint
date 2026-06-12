@@ -13,6 +13,8 @@ if [ -f "${ENV_FILE}" ]; then
     export $(cat "${ENV_FILE}")
 fi
 
+export VERSION=${VERSION:-local}
+
 export LASTMOD=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 if [[ $(git status --short) != '' ]]; then
   export COMMIT="$(git rev-parse --short HEAD) (dirty)"
@@ -20,8 +22,10 @@ else
   export COMMIT="$(git rev-parse --short HEAD)"
 fi
 
-# install development tools
-cargo install --locked --quiet --version 3.12.0 bacon
+export BUILTBY="run.sh"
+
+# install https://github.com/canop/bacon
+cargo install --locked bacon
 
 # run the app
-bacon run -- --bin namelint -- --rules ./test/custom_rules.yaml --config ./config/self.yaml
+bacon run -- --bin namelint -- --version --verbose

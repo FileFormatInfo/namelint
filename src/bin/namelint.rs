@@ -25,7 +25,6 @@ fn main() {
     let rules = builtin_rules();
 
     let mut command = Command::new("namelint")
-        .version("1.0")
         .about("Check file names for security, compatibility, best practices & standards.")
         .arg(
             Arg::new("verbose")
@@ -49,7 +48,16 @@ fn main() {
                 .default_value("plain")
                 .help("Output format for failures: plain or json")
                 .required(false),
-        );
+		)
+		// disable the built-in version flag; we handle --version manually
+		.disable_version_flag(true)
+		.arg(
+			Arg::new("version")
+				.long("version")
+				.action(clap::ArgAction::SetTrue)
+				.help("Print version")
+			)
+		;
 
     for rule in &rules {
         let values_hint = rule.values.join("|");
@@ -66,6 +74,19 @@ fn main() {
     }
 
     let matches = command.get_matches();
+
+    if matches.get_flag("version") {
+        if matches.get_flag("verbose") {
+			println!("PROGRAM : {}", env!("CARGO_PKG_NAME"));
+            println!("VERSION : {}", option_env!("VERSION").unwrap_or("(unknown)"));
+            println!("COMMIT  : {}", option_env!("COMMIT").unwrap_or("(unknown)"));
+            println!("LASTMOD : {}", option_env!("LASTMOD").unwrap_or("(unknown)"));
+            println!("BUILTBY : {}", option_env!("BUILTBY").unwrap_or("(unknown)"));
+        } else {
+	        println!("{} {}", env!("CARGO_PKG_NAME"), option_env!("VERSION").unwrap_or("(unknown)"));
+		}
+        std::process::exit(0);
+    }
 
     let raw_paths = matches
         .get_many::<String>("paths")

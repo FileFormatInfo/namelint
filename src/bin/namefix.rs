@@ -1,4 +1,4 @@
-use std::{collections::VecDeque, ffi::{OsStr, OsString}, fs, path::{Path, PathBuf}};
+use std::{collections::VecDeque, ffi::OsStr, fs, path::{Path, PathBuf}};
 use clap::{arg, Command};
 
 struct FixStats {
@@ -9,8 +9,8 @@ struct FixStats {
 }
 
 fn main() {
-    let mut command = Command::new("namefix")
-        .version("1.0")
+    let command = Command::new("namefix")
+        .version(option_env!("VERSION").unwrap_or("(unknown)"))
         .about("Fix file names containing null bytes or invalid UTF-8")
         .arg(arg!(--"dry-run" "Report count without making changes").required(false))
         .arg(arg!(-v --verbose "Print fixed file names").required(false))
@@ -130,7 +130,7 @@ fn check_and_fix_name(file_name_os: &OsStr) -> Option<(String, Issues)> {
     let current_name = file_name_os.to_string_lossy();
 
     // Check for null bytes (by checking the bytes if available)
-    if let Some(bytes) = current_name.as_bytes().windows(1).find(|b| b[0] == 0) {
+    if let Some(_bytes) = current_name.as_bytes().windows(1).find(|b| b[0] == 0) {
         issues.has_null = true;
     }
 
