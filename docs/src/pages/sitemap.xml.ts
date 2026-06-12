@@ -8,8 +8,7 @@ export const GET: APIRoute = async () => {
   // Static pages
   const pages = [
     "/",
-    "/blog.html",
-    "/schemas.html",
+    "/blog/",
   ];
 
   // Build sitemap entries
