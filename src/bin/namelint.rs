@@ -1,6 +1,6 @@
 use clap::{Arg, Command};
 use namelint::collect_cli_dirs::collect_cli_dirs;
-use namelint::process_dirs::process_dirs;
+use namelint::process_dirs::{process_dirs, EntryType};
 use namelint::rules::{builtin_rules, RuleCheckFn};
 use serde_json::json;
 
@@ -49,6 +49,15 @@ fn main() {
                 .help("Output format for failures: plain or json")
                 .required(false),
 		)
+        .arg(
+            Arg::new("type")
+                .long("type")
+                .value_name("KIND")
+                .value_parser(["dir", "file", "both"])
+                .default_value("both")
+                .help("Entry type to validate: dir, file, or both")
+                .required(false),
+        )
 		// disable the built-in version flag; we handle --version manually
 		.disable_version_flag(true)
 		.arg(
@@ -102,10 +111,26 @@ fn main() {
 		.map(|value| value.as_str())
 		.unwrap_or("plain");
 
+	let entry_type = matches
+		.get_one::<String>("type")
+		.map(|value| value.as_str())
+		.map(|value| match value {
+			"dir" => EntryType::Dir,
+			"file" => EntryType::File,
+			_ => EntryType::Both,
+		})
+		.unwrap_or(EntryType::Both);
+
     if matches.get_flag("verbose") {
         for dir in &dirs {
             println!("DEBUG: directory on command line: {}", dir.display());
         }
+        let kind = match entry_type {
+            EntryType::Dir => "dir",
+            EntryType::File => "file",
+            EntryType::Both => "both",
+        };
+        println!("DEBUG: type = {}", kind);
         for rule in &rules {
             let param = matches.get_one::<String>(rule.slug).cloned();
             let effective = param.as_deref().unwrap_or(rule.no_arg);
@@ -125,7 +150,7 @@ fn main() {
         })
         .collect();
 
-    let error_count = process_dirs(dirs, |name| {
+    let error_count = process_dirs(dirs, entry_type, |name| {
         let mut file_error_count = 0usize;
 
         for active_rule in &active {

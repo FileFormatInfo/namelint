@@ -1,6 +1,13 @@
 use std::{fs, path::PathBuf};
 
-pub fn process_dirs<F>(mut dirs: Vec<PathBuf>, mut meta_rule: F) -> Result<usize, String>
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum EntryType {
+	Dir,
+	File,
+	Both,
+}
+
+pub fn process_dirs<F>(mut dirs: Vec<PathBuf>, entry_type: EntryType, mut meta_rule: F) -> Result<usize, String>
 where
 	F: FnMut(&str) -> usize,
 {
@@ -13,15 +20,20 @@ where
 		for entry in entries {
 			let entry = entry.map_err(|e| format!("cannot read directory entry in {}: {}", dir.display(), e))?;
 			let path = entry.path();
+			let file_name = entry.file_name();
+			let name = file_name.to_string_lossy();
 
 			if path.is_dir() {
+				if entry_type == EntryType::Dir || entry_type == EntryType::Both {
+					error_count += meta_rule(&name);
+				}
 				dirs.push(path);
 				continue;
 			}
 
-			let file_name = entry.file_name();
-			let name = file_name.to_string_lossy();
-			error_count += meta_rule(&name);
+			if entry_type == EntryType::File || entry_type == EntryType::Both {
+				error_count += meta_rule(&name);
+			}
 		}
 	}
 
