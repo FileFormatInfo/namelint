@@ -1,0 +1,44 @@
+---
+import { getCollection } from "astro:content";
+import DefaultLayout from "../../layouts/DefaultLayout.astro";
+
+const postSlug = (post) => (post.slug ?? post.id).replace(/\.md$/, "");
+
+const posts = (await getCollection("posts"))
+  .map((post) => {
+    const slug = postSlug(post);
+    const dateText = slug.slice(0, 10);
+    const [year] = dateText.split("-");
+    return {
+      ...post,
+      slug,
+      dateText,
+      year,
+      url: `/blog/${year}/${slug}.html`
+    };
+  })
+  .sort((a, b) => b.dateText.localeCompare(a.dateText));
+---
+<DefaultLayout title="Blog Posts" isBlog={true}>
+  <table class="table table-striped border-top">
+    <tbody>
+      {
+        posts.map((post) => (
+          <tr>
+            <td>{post.dateText}</td>
+            <td>
+              {post.data.draft && <span class="badge text-bg-secondary">draft</span>} <a href={post.url}>{post.data.title}</a>
+            </td>
+            <td class="text-end">
+              {(post.data.tags ?? []).map((tag) => (
+                <a href={`/blog/tags.html?tag=${encodeURIComponent(tag)}`} class="badge text-bg-secondary">
+                  {tag.replaceAll("_", " ")}
+                </a>
+              ))}
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</DefaultLayout>

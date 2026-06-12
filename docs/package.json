@@ -1,0 +1,16 @@
+{
+  "name": "namelint-docs",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --port 4000",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@types/node": "^25.9.3",
+    "astro": "^6.4.6",
+    "marked": "^18.0.5"
+  }
+}

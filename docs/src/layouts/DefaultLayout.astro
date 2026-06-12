@@ -1,0 +1,159 @@
+---
+export interface Props {
+  title: string;
+  h1?: string;
+  isHome?: boolean;
+  isBlog?: boolean;
+  isSchemas?: boolean;
+  draft?: boolean;
+  previousUrl?: string;
+  previousTitle?: string;
+  nextUrl?: string;
+  nextTitle?: string;
+}
+
+const {
+  title,
+  h1,
+  isHome = false,
+  isBlog = false,
+  isSchemas = false,
+  draft = false,
+  previousUrl,
+  previousTitle,
+  nextUrl,
+  nextTitle
+} = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{h1 ? title : `${title} - Namelint`}</title>
+    <meta name="referrer" content="unsafe-url" />
+    <script is:inline>
+      if (window.top.location !== window.location) {
+        window.top.location.href = document.location.href;
+      }
+    </script>
+    {
+      isHome && (
+        <>
+          <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+          <meta
+            property="og:description"
+            content="Check file and directory names for security, compatibility, best practices and standards"
+          />
+          <meta property="og:image" content="https://www.namelint.dev/images/banner.png" />
+          <meta property="og:title" content="namelint: file and directory name linter" />
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content="https://www.namelint.dev/" />
+          <script type="application/ld+json" is:inline>
+            {`{
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              "name": "namelint",
+              "operatingSystem": "Linux, MacOS, Windows",
+              "applicationCategory": "SecurityApplication"
+            }`}
+          </script>
+        </>
+      )
+    }
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:ital,wght@0,300..800;1,300..800&family=Tinos:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <style>
+      :global(code) {
+        background-color: #f3f3f3;
+        border: 1px solid #bbb;
+        border-radius: 0.35em;
+        padding: 0.4em;
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand border-bottom py-0">
+      <div class="container">
+        <a class="navbar-brand text-secondary d-flex align-items-center" style="font-family:'Merriweather Sans';" href="/">
+          <img src="/favicon.svg" alt="Logo" height="36" class="d-inline-block align-text-top me-2 py-0" />
+          namelint</a
+        >
+        <div class="justify-content-end align-items-center d-flex">
+          <ul class="navbar-nav">
+            <li class="d-none d-md-inline nav-item">
+              <a class:list={["nav-link", { active: isHome, "fw-bold": isHome }]} href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class:list={["nav-link", { active: isBlog, "fw-bold": isBlog }]} href="/blog/">
+                <img alt="Blog" class="fa d-sm-none ps-2" src="/images/fa/rss-square.svg" style="height: 1.25em;" />
+                <span class="d-none d-sm-inline">Blog</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/FileFormatInfo/namelint">
+                <img alt="Source" class="fa d-sm-none ps-2" src="/images/fa/git-alt.svg" style="height: 1.25em;" />
+                <span class="d-none d-sm-inline">Source</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+      <div class="row">
+        <div class="col pt-2">
+          <div class="pb-2 d-flex align-items-center justify-content-between">
+            <h1 class="flex-grow-1">{h1 ?? title}</h1>
+            <div class="text-end">
+              {
+                previousUrl && (
+                  <a class="btn btn-outline-secondary" href={previousUrl} title={previousTitle}>
+                    &laquo;<span class="d-none d-lg-inline"> {previousTitle}</span>
+                  </a>
+                )
+              }
+              {
+                nextUrl && (
+                  <a class="btn btn-outline-secondary" href={nextUrl} title={nextTitle}>
+                    <span class="d-none d-lg-inline">{nextTitle} </span>&raquo;
+                  </a>
+                )
+              }
+            </div>
+          </div>
+          {draft && <div class="alert alert-warning">This post is a draft!</div>}
+          <slot />
+          {
+            isBlog && (
+              <p class="text-center">
+                <small>
+                  <a href="/blog/rss.xml"
+                    ><img alt="RSS feed" src="/images/rss.svg" class="pe-2" style="height:1rem;" />Subscribe</a
+                  >
+                </small>
+              </p>
+            )
+          }
+        </div>
+      </div>
+      <hr />
+      <footer class="hidden-print">
+        <p class="small text-muted text-center">
+          <a href="https://github.com/FileFormatInfo/namelint">Source</a>
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,77 @@
+---
+import { getCollection, render } from "astro:content";
+import DefaultLayout from "../../../layouts/DefaultLayout.astro";
+
+export async function getStaticPaths() {
+  const normalizeSlug = (post) => (post.slug ?? post.id).replace(/\.md$/, "");
+  const allPosts = await getCollection("posts");
+  const sortedPosts = allPosts
+    .map((post) => ({ ...post, normalizedSlug: normalizeSlug(post) }))
+    .sort((a, b) => a.normalizedSlug.localeCompare(b.normalizedSlug));
+
+  return sortedPosts.map((post, index) => {
+    const dateText = post.normalizedSlug.slice(0, 10);
+    const [year] = dateText.split("-");
+    const previous = index > 0 ? sortedPosts[index - 1] : undefined;
+    const next = index < sortedPosts.length - 1 ? sortedPosts[index + 1] : undefined;
+
+    return {
+      params: {
+        year,
+        slug: post.normalizedSlug
+      },
+      props: {
+        post: {
+          ...post,
+          normalizedSlug: post.normalizedSlug
+        },
+        previous,
+        next
+      }
+    };
+  });
+}
+
+const normalizeSlug = (post) => (post.slug ?? post.id).replace(/\.md$/, "");
+const allPosts = (await getCollection("posts"))
+  .map((post) => ({ ...post, normalizedSlug: normalizeSlug(post) }))
+  .sort((a, b) => a.normalizedSlug.localeCompare(b.normalizedSlug));
+const { year, slug } = Astro.params;
+const routePost = allPosts.find((entry) => {
+  const dateText = entry.normalizedSlug.slice(0, 10);
+  const [entryYear] = dateText.split("-");
+  return entry.normalizedSlug === slug && entryYear === year;
+});
+
+if (!routePost) {
+  throw new Error(`Post not found for route ${year}/${slug}`);
+}
+
+const index = allPosts.findIndex((entry) => entry.normalizedSlug === routePost.normalizedSlug);
+const previous = index > 0 ? allPosts[index - 1] : undefined;
+const next = index < allPosts.length - 1 ? allPosts[index + 1] : undefined;
+const post = routePost;
+const { Content } = await render(post);
+
+const toUrl = (entry) => {
+  if (!entry) {
+    return undefined;
+  }
+
+  const entryDate = entry.normalizedSlug.slice(0, 10);
+  const [entryYear] = entryDate.split("-");
+  return `/blog/${entryYear}/${entry.normalizedSlug}.html`;
+};
+---
+<DefaultLayout
+  title={post.data.title}
+  h1={post.data.h1}
+  draft={post.data.draft}
+  isBlog={true}
+  previousUrl={toUrl(previous)}
+  previousTitle={previous?.data.title}
+  nextUrl={toUrl(next)}
+  nextTitle={next?.data.title}
+>
+  <Content />
+</DefaultLayout>
