@@ -58,6 +58,22 @@ fn main() {
                 .help("Entry type to validate: dir, file, or both")
                 .required(false),
         )
+        .arg(
+            Arg::new("skip-dir")
+                .long("skip-dir")
+                .value_name("NAME")
+                .action(clap::ArgAction::Append)
+                .help("Directory name to skip (repeatable)")
+                .required(false),
+        )
+        .arg(
+            Arg::new("skip-file")
+                .long("skip-file")
+                .value_name("NAME")
+                .action(clap::ArgAction::Append)
+                .help("File name to skip (repeatable)")
+                .required(false),
+        )
 		// disable the built-in version flag; we handle --version manually
 		.disable_version_flag(true)
 		.arg(
@@ -121,6 +137,16 @@ fn main() {
 		})
 		.unwrap_or(EntryType::Both);
 
+    let skip_dirs = matches
+        .get_many::<String>("skip-dir")
+        .map(|vals| vals.cloned().collect::<Vec<String>>())
+        .unwrap_or_default();
+
+    let skip_files = matches
+        .get_many::<String>("skip-file")
+        .map(|vals| vals.cloned().collect::<Vec<String>>())
+        .unwrap_or_default();
+
     if matches.get_flag("verbose") {
         for dir in &dirs {
             println!("DEBUG: directory on command line: {}", dir.display());
@@ -131,6 +157,12 @@ fn main() {
             EntryType::Both => "both",
         };
         println!("DEBUG: type = {}", kind);
+        if !skip_dirs.is_empty() {
+            println!("DEBUG: skip-dir = {}", skip_dirs.join(", "));
+        }
+        if !skip_files.is_empty() {
+            println!("DEBUG: skip-file = {}", skip_files.join(", "));
+        }
         for rule in &rules {
             let param = matches.get_one::<String>(rule.slug).cloned();
             let effective = param.as_deref().unwrap_or(rule.no_arg);
@@ -150,7 +182,7 @@ fn main() {
         })
         .collect();
 
-    let error_count = process_dirs(dirs, entry_type, |name| {
+    let error_count = process_dirs(dirs, entry_type, &skip_dirs, &skip_files, |name| {
         let mut file_error_count = 0usize;
 
         for active_rule in &active {

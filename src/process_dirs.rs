@@ -7,7 +7,13 @@ pub enum EntryType {
 	Both,
 }
 
-pub fn process_dirs<F>(mut dirs: Vec<PathBuf>, entry_type: EntryType, mut meta_rule: F) -> Result<usize, String>
+pub fn process_dirs<F>(
+	mut dirs: Vec<PathBuf>,
+	entry_type: EntryType,
+	skip_dirs: &[String],
+	skip_files: &[String],
+	mut meta_rule: F,
+) -> Result<usize, String>
 where
 	F: FnMut(&str) -> usize,
 {
@@ -24,10 +30,17 @@ where
 			let name = file_name.to_string_lossy();
 
 			if path.is_dir() {
+				if skip_dirs.iter().any(|skip| skip == &name) {
+					continue;
+				}
 				if entry_type == EntryType::Dir || entry_type == EntryType::Both {
 					error_count += meta_rule(&name);
 				}
 				dirs.push(path);
+				continue;
+			}
+
+			if skip_files.iter().any(|skip| skip == &name) {
 				continue;
 			}
 
