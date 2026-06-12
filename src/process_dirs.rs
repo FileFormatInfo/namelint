@@ -1,4 +1,5 @@
 use std::{fs, path::PathBuf};
+use unicase::UniCase;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum EntryType {
@@ -12,6 +13,9 @@ pub fn process_dirs<F>(
 	entry_type: EntryType,
 	skip_dirs: &[String],
 	skip_files: &[String],
+	ext_case_insensitive: &[String],
+	ext_case_sensitive: &[String],
+	ext_unicode_case_insensitive: &[String],
 	mut meta_rule: F,
 ) -> Result<usize, String>
 where
@@ -44,6 +48,15 @@ where
 				continue;
 			}
 
+			if !extension_matches(
+				&path,
+				ext_case_insensitive,
+				ext_case_sensitive,
+				ext_unicode_case_insensitive,
+			) {
+				continue;
+			}
+
 			if entry_type == EntryType::File || entry_type == EntryType::Both {
 				error_count += meta_rule(&name);
 			}
@@ -51,4 +64,30 @@ where
 	}
 
 	Ok(error_count)
+}
+
+fn extension_matches(
+	path: &PathBuf,
+	ext_case_insensitive: &[String],
+	ext_case_sensitive: &[String],
+	ext_unicode_case_insensitive: &[String],
+) -> bool {
+	if ext_case_insensitive.is_empty()
+		&& ext_case_sensitive.is_empty()
+		&& ext_unicode_case_insensitive.is_empty()
+	{
+		return true;
+	}
+
+	let Some(ext) = path.extension().and_then(|value| value.to_str()) else {
+		return false;
+	};
+
+	ext_case_sensitive.iter().any(|candidate| ext == candidate)
+		|| ext_case_insensitive
+			.iter()
+			.any(|candidate| ext.eq_ignore_ascii_case(candidate))
+		|| ext_unicode_case_insensitive
+			.iter()
+			.any(|candidate| UniCase::new(ext) == UniCase::new(candidate.as_str()))
 }

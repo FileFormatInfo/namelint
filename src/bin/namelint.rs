@@ -74,6 +74,30 @@ fn main() {
                 .help("File name to skip (repeatable)")
                 .required(false),
         )
+        .arg(
+            Arg::new("ext")
+                .long("ext")
+                .value_name("EXT")
+                .action(clap::ArgAction::Append)
+                .help("File extension filter, case-insensitive (repeatable)")
+                .required(false),
+        )
+        .arg(
+            Arg::new("extcase")
+                .long("ext-cs")
+                .value_name("EXT")
+                .action(clap::ArgAction::Append)
+                .help("File extension filter, case-sensitive (repeatable)")
+                .required(false),
+        )
+        .arg(
+            Arg::new("ext-ci")
+                .long("ext-ci")
+                .value_name("EXT")
+                .action(clap::ArgAction::Append)
+                .help("File extension filter, Unicode case-insensitive (repeatable)")
+                .required(false),
+        )
 		// disable the built-in version flag; we handle --version manually
 		.disable_version_flag(true)
 		.arg(
@@ -147,6 +171,30 @@ fn main() {
         .map(|vals| vals.cloned().collect::<Vec<String>>())
         .unwrap_or_default();
 
+    let ext_case_insensitive = matches
+        .get_many::<String>("ext")
+        .map(|vals| {
+            vals.map(|value| value.trim_start_matches('.').to_string())
+                .collect::<Vec<String>>()
+        })
+        .unwrap_or_default();
+
+    let ext_case_sensitive = matches
+        .get_many::<String>("extcase")
+        .map(|vals| {
+            vals.map(|value| value.trim_start_matches('.').to_string())
+                .collect::<Vec<String>>()
+        })
+        .unwrap_or_default();
+
+    let ext_unicode_case_insensitive = matches
+        .get_many::<String>("ext-ci")
+        .map(|vals| {
+            vals.map(|value| value.trim_start_matches('.').to_string())
+                .collect::<Vec<String>>()
+        })
+        .unwrap_or_default();
+
     if matches.get_flag("verbose") {
         for dir in &dirs {
             println!("DEBUG: directory on command line: {}", dir.display());
@@ -162,6 +210,15 @@ fn main() {
         }
         if !skip_files.is_empty() {
             println!("DEBUG: skip-file = {}", skip_files.join(", "));
+        }
+        if !ext_case_insensitive.is_empty() {
+            println!("DEBUG: ext = {}", ext_case_insensitive.join(", "));
+        }
+        if !ext_case_sensitive.is_empty() {
+            println!("DEBUG: ext-cs = {}", ext_case_sensitive.join(", "));
+        }
+        if !ext_unicode_case_insensitive.is_empty() {
+            println!("DEBUG: ext-ci = {}", ext_unicode_case_insensitive.join(", "));
         }
         for rule in &rules {
             let param = matches.get_one::<String>(rule.slug).cloned();
@@ -182,7 +239,15 @@ fn main() {
         })
         .collect();
 
-    let error_count = process_dirs(dirs, entry_type, &skip_dirs, &skip_files, |name| {
+    let error_count = process_dirs(
+        dirs,
+        entry_type,
+        &skip_dirs,
+        &skip_files,
+        &ext_case_insensitive,
+        &ext_case_sensitive,
+        &ext_unicode_case_insensitive,
+        |name| {
         let mut file_error_count = 0usize;
 
         for active_rule in &active {
@@ -193,7 +258,8 @@ fn main() {
         }
 
         file_error_count
-    })
+    },
+    )
     .unwrap_or_else(|e| {
         eprintln!("ERROR: {}", e);
         std::process::exit(1);
