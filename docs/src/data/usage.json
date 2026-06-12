@@ -1,0 +1,176 @@
+{
+  "args": [
+    {
+      "help": "Verbose output",
+      "long": "verbose",
+      "name": "verbose",
+      "short": "v"
+    },
+    {
+      "help": "Directories to check (default: current directory)",
+      "name": "paths",
+      "repeatable": true
+    },
+    {
+      "default": [
+        "plain"
+      ],
+      "help": "Output format for failures: plain or json",
+      "long": "output",
+      "name": "output",
+      "values": [
+        "plain",
+        "json"
+      ]
+    },
+    {
+      "default": [
+        "both"
+      ],
+      "help": "Entry type to validate: dir, file, or both",
+      "long": "type",
+      "name": "type",
+      "values": [
+        "dir",
+        "file",
+        "both"
+      ]
+    },
+    {
+      "help": "Directory name to skip (repeatable)",
+      "long": "skip-dir",
+      "name": "skip-dir",
+      "repeatable": true
+    },
+    {
+      "help": "File name to skip (repeatable)",
+      "long": "skip-file",
+      "name": "skip-file",
+      "repeatable": true
+    },
+    {
+      "help": "File extension filter, case-insensitive (repeatable)",
+      "long": "ext",
+      "name": "ext",
+      "repeatable": true
+    },
+    {
+      "help": "File extension filter, case-sensitive (repeatable)",
+      "long": "ext-cs",
+      "name": "extcase",
+      "repeatable": true
+    },
+    {
+      "help": "File extension filter, Unicode case-insensitive (repeatable)",
+      "long": "ext-ci",
+      "name": "ext-ci",
+      "repeatable": true
+    },
+    {
+      "help": "Print generated command documentation in Markdown",
+      "long": "docs",
+      "name": "docs"
+    },
+    {
+      "help": "Print version",
+      "long": "version",
+      "name": "version"
+    }
+  ],
+  "rules": [
+    {
+      "long": "Ensures the filename is in Unicode NFC form.\n\nThis helps avoid visually identical names being stored with different byte representations across filesystems and tools.",
+      "missing_value": "on",
+      "no_arg": "on",
+      "short": "Filename must be NFC-normalized Unicode.",
+      "slug": "nfc",
+      "values": [
+        "on",
+        "off"
+      ]
+    },
+    {
+      "long": "Rejects filenames that include Unicode combining marks.\n\nCombining marks can make names hard to compare and reason about across terminals, shells, and filesystems.",
+      "missing_value": "on",
+      "no_arg": "on",
+      "short": "Filename must not contain combining marks.",
+      "slug": "no_combining",
+      "values": [
+        "on",
+        "off"
+      ]
+    },
+    {
+      "long": "Ensures filename components are properly trimmed.\n\n- **base**: Stem (first dot-separated segment) must be trimmed (no leading/trailing whitespace)\n- **ext**: Extension (last dot-separated segment) must be trimmed\n- **both**: Both stem and extension must be trimmed, and no whitespace immediately before periods",
+      "missing_value": "both",
+      "no_arg": "both",
+      "short": "No leading or trailing whitespace.",
+      "slug": "trimmed",
+      "values": [
+        "base",
+        "ext",
+        "both",
+        "off"
+      ]
+    },
+    {
+      "long": "Controls internal whitespace policy for filenames.\n\n- `none`: no internal whitespace allowed\n- `space`: allow single ASCII spaces only\n- `spaces`: allow one or more ASCII spaces\n- `any`: allow any internal whitespace",
+      "missing_value": "space",
+      "no_arg": "space",
+      "short": "Control how internal whitespace is allowed in filenames.",
+      "slug": "whitespace",
+      "values": [
+        "none",
+        "space",
+        "spaces",
+        "any"
+      ]
+    },
+    {
+      "long": "Restricts filenames to the [POSIX Portable Filename Character Set](https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap03.html#tag_03_265): ASCII letters, digits, dot (`.`), underscore (`_`), and dash (`-`).",
+      "missing_value": "on",
+      "no_arg": "on",
+      "short": "Only POSIX portable filename characters (A-Za-z0-9._-).",
+      "slug": "posix_portable",
+      "values": [
+        "on",
+        "off"
+      ]
+    },
+    {
+      "long": "Restricts filenames to the [RFC 3986 unreserved characters](https://datatracker.ietf.org/doc/html/rfc3986#section-2.3): ASCII letters, digits, hyphen (`-`), dot (`.`), underscore (`_`), and tilde (`~`).\n\nThese characters are safe anywhere in a URL without percent-encoding.",
+      "missing_value": "on",
+      "no_arg": "off",
+      "short": "Only RFC 3986 unreserved characters (A-Za-z0-9-._~).",
+      "slug": "url_safe",
+      "values": [
+        "on",
+        "off"
+      ]
+    },
+    {
+      "long": "Restricts filenames to characters that are unambiguously safe as a URL path segment or query parameter value: ASCII letters, digits, hyphen (`-`), and underscore (`_`).\n\nMore restrictive than `url_safe`: excludes dot (`.`) to avoid path-traversal ambiguity and tilde (`~`) which some servers treat specially.",
+      "missing_value": "on",
+      "no_arg": "off",
+      "short": "Only characters safe as a URL path/query component (A-Za-z0-9-_).",
+      "slug": "url_component_safe",
+      "values": [
+        "on",
+        "off"
+      ]
+    },
+    {
+      "long": "Restricts filenames to ASCII letters and digits.\n\n- `base`: no dots — alphanumerics only in the full name\n- `both`: allows a single dot separating an alphanumeric stem from an alphanumeric extension\n- `ext`: allows multiple dot-separated alphanumeric segments",
+      "missing_value": "both",
+      "no_arg": "ext",
+      "short": "Only ASCII alphanumeric characters, with optional dot separator.",
+      "slug": "ascii_alphanumeric",
+      "values": [
+        "off",
+        "base",
+        "ext",
+        "both"
+      ]
+    }
+  ]
+}

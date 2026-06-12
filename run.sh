@@ -31,4 +31,4 @@ if ! command -v bacon &> /dev/null; then
 fi
 
 # run the app
-bacon run -- --bin namelint -- --version --verbose
+bacon run -- --bin namelint -- --docs

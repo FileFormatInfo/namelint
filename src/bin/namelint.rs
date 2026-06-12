@@ -31,7 +31,7 @@ fn main() {
                 .short('v')
                 .long("verbose")
                 .action(clap::ArgAction::SetTrue)
-                .help("Print resolved directories")
+                .help("Verbose output")
                 .required(false),
         )
         .arg(
@@ -98,6 +98,14 @@ fn main() {
                 .help("File extension filter, Unicode case-insensitive (repeatable)")
                 .required(false),
         )
+        .arg(
+            Arg::new("docs")
+                .long("docs")
+                .action(clap::ArgAction::SetTrue)
+                .help("Print generated command documentation in Markdown")
+                .hide(true)
+                .required(false),
+        )
 		// disable the built-in version flag; we handle --version manually
 		.disable_version_flag(true)
 		.arg(
@@ -122,7 +130,7 @@ fn main() {
         );
     }
 
-    let matches = command.get_matches();
+    let matches = command.clone().get_matches();
 
     if matches.get_flag("version") {
         if matches.get_flag("verbose") {
@@ -134,6 +142,63 @@ fn main() {
         } else {
 	        println!("{} {}", env!("CARGO_PKG_NAME"), option_env!("VERSION").unwrap_or("(unknown)"));
 		}
+        std::process::exit(0);
+    }
+
+    if matches.get_flag("docs") {
+        let rule_slugs: std::collections::HashSet<&str> = rules.iter().map(|r| r.slug).collect();
+        let args_json: Vec<serde_json::Value> = command
+            .get_arguments()
+            .filter(|arg| !rule_slugs.contains(arg.get_id().as_str()))
+            .filter_map(|arg| {
+                let mut arg_obj = serde_json::Map::new();
+
+                arg_obj.insert("name".to_string(), json!(arg.get_id().as_str()));
+
+                if let Some(short) = arg.get_short() {
+                    arg_obj.insert("short".to_string(), json!(short.to_string()));
+                }
+
+                if let Some(long) = arg.get_long() {
+                    arg_obj.insert("long".to_string(), json!(long));
+                }
+
+                if let Some(help) = arg.get_help() {
+                    arg_obj.insert("help".to_string(), json!(help.to_string()));
+                }
+
+                let possible_values = arg.get_possible_values();
+                if !possible_values.is_empty() {
+                    let values: Vec<&str> = possible_values.iter().map(|pv| pv.get_name()).collect();
+                    arg_obj.insert("values".to_string(), json!(values));
+                }
+
+                let defaults = arg.get_default_values();
+                if !defaults.is_empty() {
+                    let default_strs: Vec<&str> = defaults.iter().map(|d| d.to_str().unwrap_or("")).collect();
+                    arg_obj.insert("default".to_string(), json!(default_strs));
+                }
+
+                if matches!(arg.get_action(), clap::ArgAction::Append) {
+                    arg_obj.insert("repeatable".to_string(), json!(true));
+                }
+
+                Some(json!(arg_obj))
+            })
+            .collect();
+
+        let docs = json!({
+            "args": args_json,
+            "rules": rules.iter().map(|rule| json!({
+                "slug": rule.slug,
+                "short": rule.short_description,
+                "long": rule.long_description_markdown,
+                "values": rule.values,
+                "no_arg": rule.no_arg,
+                "missing_value": rule.missing_value,
+            })).collect::<Vec<_>>(),
+        });
+        println!("{}", docs.to_string());
         std::process::exit(0);
     }
 

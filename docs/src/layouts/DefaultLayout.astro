@@ -12,6 +12,9 @@ export interface Props {
   nextTitle?: string;
 }
 
+const pathname = Astro.url.pathname;
+
+
 const {
   title,
   h1,
@@ -94,6 +97,12 @@ const {
           <ul class="navbar-nav">
             <li class="d-none d-md-inline nav-item">
               <a class:list={["nav-link", { active: isHome, "fw-bold": isHome }]} href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class:list={["nav-link", { active: pathname === "/usage.html", "fw-bold": pathname === "/usage.html" }]} href="/usage.html">
+                <img alt="Usage" class="fa d-sm-none ps-2" src="/images/fa/rss-square.svg" style="height: 1.25em;" />
+                <span class="d-none d-sm-inline">Usage</span>
+              </a>
             </li>
             <li class="nav-item">
               <a class:list={["nav-link", { active: isBlog, "fw-bold": isBlog }]} href="/blog/">

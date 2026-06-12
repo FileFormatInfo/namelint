@@ -1,0 +1,41 @@
+---
+import DefaultLayout from "../layouts/DefaultLayout.astro";
+import usageData from '../data/usage.json';
+import { Marked } from "marked";
+
+const customMarked = new Marked();
+
+// 2. Attach your custom renderer only to this instance
+customMarked.use({
+	renderer: {
+		listitem(token) {
+			const innerHtml = this.parser.parseInline(token.tokens)
+			return `<li class="mt-2">${innerHtml}</li>\n`;
+		}
+	}
+});
+
+---
+
+<DefaultLayout title="Usage - Namelint" h1="Namelint Usage">
+
+  <h2>Command line Arguments</h2>
+  <ul>
+    {
+      usageData.args.filter(arg => arg.long).map((arg) => (
+        <li class="mt-3"><code>--{arg.long}</code> - {arg.help}</li>
+      ))
+    }
+  </ul>
+
+  <h2>Rules</h2>
+  {
+	usageData.rules.sort((a, b) => a.slug.localeCompare(b.slug)).map((rule) => (
+		<details class="ms-4 mt-2 mb-3">
+			<summary><code>{rule.slug}</code> - {rule.short}</summary>
+			<div class="ms-3 mt-2 mb-3" set:html={customMarked.parse(rule.long)} />
+		</details>
+	))
+  }
+</DefaultLayout>
+
