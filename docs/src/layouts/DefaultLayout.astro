@@ -52,14 +52,14 @@ const {
           <meta property="og:title" content="namelint: file and directory name linter" />
           <meta property="og:type" content="website" />
           <meta property="og:url" content="https://www.namelint.dev/" />
-          <script type="application/ld+json" is:inline>
-            {`{
+          <script type="application/ld+json" set:html={
+            JSON.stringify({
               "@context": "https://schema.org",
               "@type": "SoftwareApplication",
               "name": "namelint",
               "operatingSystem": "Linux, MacOS, Windows",
               "applicationCategory": "SecurityApplication"
-            }`}
+          	}, null, 2)}
           </script>
         </>
       )
